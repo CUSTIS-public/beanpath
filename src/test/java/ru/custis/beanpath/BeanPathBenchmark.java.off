@@ -1,0 +1,99 @@
+/**
+ * Copyright (C) 2014 CUSTIS (http://www.custis.ru/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package custis.toolbox.beanpath;
+
+import custis.toolbox.beanpath.beans.Document;
+import custis.toolbox.beanpath.beans.Person;
+import org.openjdk.jmh.annotations.*;
+
+import java.util.concurrent.TimeUnit;
+
+import static custis.toolbox.beanpath.BeanPathMagic.$;
+import static custis.toolbox.beanpath.BeanPathMagic.$$;
+import static custis.toolbox.beanpath.BeanPathMagic.root;
+
+@State(Scope.Thread)
+@BenchmarkMode({Mode.AverageTime})
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@Warmup(iterations = 3, time = 1000, timeUnit = TimeUnit.MILLISECONDS)
+@Measurement(iterations = 10, time = 1000, timeUnit = TimeUnit.MILLISECONDS)
+@Fork(1)
+public class BeanPathBenchmark {
+
+    /*
+     * This benchmark uses OpenJDK's jmh (http://openjdk.java.net/projects/code-tools/jmh/).
+     *
+     * Because jmh currently published in sources only, this file renamed nad dependency
+     * on jmh in pom.xml commented in order not to break compilation when you don't have jmh.
+     *
+     * To run benchmark:
+     *  1) obtain and build jmh, follow the steps described on website;
+     *  2) rename this file and uncomment jmh dependency in pom.xml;
+     *  3) run BeanPathBenchmark.main() with no arguments from IDE;
+     *  4) (optional) examine results.
+     */
+
+    public static void main(String[] args) {
+        // Delegating main method to run benchmark directly from IDE
+        org.openjdk.jmh.Main.main(new String[]{
+                ".*BeanPathBenchmark.*", "-gc", "true"});
+    }
+
+    @GenerateMicroBenchmark
+    public BeanPath<?> byHand() {
+        return BeanPath.root(Person.class).append("document", Document.class).append("number", String.class);
+    }
+
+    @GenerateMicroBenchmark
+    public String byHand_toDotDelimitedString() {
+        return BeanPath.root(Person.class).append("document", Document.class).append("number", String.class).toDotDelimitedString();
+    }
+
+    @GenerateMicroBenchmark
+    public BeanPath<?> withMagic() {
+        final Person person = root(Person.class);
+        return $(person.getDocument().getNumber());
+    }
+
+    @GenerateMicroBenchmark
+    public String withMagic_toDotDelimitedString() {
+        final Person person = root(Person.class);
+        return $$(person.getDocument().getNumber());
+    }
+
+    @GenerateMicroBenchmark
+    public BeanPath<?> withMagic_generic() throws Exception {
+        final Person person = root(Person.class);
+        return $(person.getBestFriend().getId());
+    }
+
+    /*
+     * Typical benchmark results (Core i5 @ 3.30GHz)
+     * ---------------------------------------------
+     *
+     * # Warmup: 3 iterations, 1000 ms each
+     * # Measurement: 10 iterations, 1000 ms each
+     * # Benchmark mode: Average time, time/op
+     *
+     * Benchmark                                                  Mode Thr     Count  Sec         Mean   Mean error    Units
+     * c.t.b.BeanPathBenchmark.byHand                             avgt   1        10    1       21,924        0,378    ns/op
+     * c.t.b.BeanPathBenchmark.byHand_toDotDelimitedString        avgt   1        10    1       55,529        0,419    ns/op
+     * c.t.b.BeanPathBenchmark.withMagic                          avgt   1        10    1      121,152        0,524    ns/op
+     * c.t.b.BeanPathBenchmark.withMagic_toDotDelimitedString     avgt   1        10    1      169,048        1,336    ns/op
+     * c.t.b.BeanPathBenchmark.withMagic_generic                  avgt   1        10    1      345,671        2,316    ns/op
+     */
+}
