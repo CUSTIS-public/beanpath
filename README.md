@@ -6,8 +6,8 @@ Staticly checked Java Baen poperty paths to be used instead of string literals.
 Eg:
 ```java
 Account account = root(Account.class);
-BaenPath<String> customerNameProp = $( account.gertCustomer().getName() ) );
-customerNameProp.toDotDelimitedString() // => "customer.name"
+BaenPath<String> customerNameProp = $( account.gertCustomer().getName() );
+// then customerNameProp.toDotDelimitedString() => "customer.name"
 ```
 
 The core idea is to use runtime proxies to capture method (as in mock frameworks).
