@@ -36,23 +36,23 @@ public class BeanPathMagicTest {
 
         // String property
         assertEquals($(person.getName()),
-                     BeanPath.root(Person.class).append("name", String.class));
+                BeanPath.root(Person.class).append("name", String.class));
 
         // nested property
         assertEquals($(person.getDocument().getNumber()),
-                     BeanPath.root(Person.class).append("document", Document.class).append("number", String.class));
+                BeanPath.root(Person.class).append("document", Document.class).append("number", String.class));
 
         // primitive property
         assertEquals($(person.getAge()),
-                     BeanPath.root(Person.class).append("age", Integer.class));
+                BeanPath.root(Person.class).append("age", Integer.class));
 
         // enum property
         assertEquals($(person.getGender()),
-                     BeanPath.root(Person.class).append("gender", Gender.class));
+                BeanPath.root(Person.class).append("gender", Gender.class));
 
         // recursive property
         assertEquals($(person.getBestFriend().getName()),
-                     BeanPath.root(Person.class).append("bestFriend", Person.class).append("name", String.class));
+                BeanPath.root(Person.class).append("bestFriend", Person.class).append("name", String.class));
 
         // double-dollar shortcut
         assertEquals($$(person.getDocument().getIssuedBy()), "document.issuedBy");
@@ -65,10 +65,13 @@ public class BeanPathMagicTest {
 
         assertSame(root(Person.class), root(Person.class));
         assertSame(root(Document.class), root(Document.class));
-        assertSame(root(new TypeLiteral<Identified<?>>() {}), root(new TypeLiteral<Identified<?>>() {}));
+        assertSame(root(new TypeLiteral<Identified<?>>() {
+        }), root(new TypeLiteral<Identified<?>>() {
+        }));
     }
 
     public static abstract class Uninstantaible {
+
         private Uninstantaible() {
             throw new AssertionError();
         }
@@ -153,7 +156,8 @@ public class BeanPathMagicTest {
     public void generics_TypeLiteralUsage() {
 
         // One can use TypeToken
-        final Identified<String> identified = root(new TypeLiteral<Identified<String>>() {});
+        final Identified<String> identified = root(new TypeLiteral<Identified<String>>() {
+        });
         assertEquals($(identified.getId()).getType(), String.class);
     }
 
@@ -165,7 +169,7 @@ public class BeanPathMagicTest {
     public void awkward_propertyWithParameter() {
         final Person person = root(Person.class);
         assertEquals($(person.withParam(0)),
-                     BeanPath.root(Person.class).append("withParam", String.class));
+                BeanPath.root(Person.class).append("withParam", String.class));
     }
 
     @Test
@@ -180,7 +184,7 @@ public class BeanPathMagicTest {
      */
 
     @Test(expectedExceptions = BeanPathMagicException.class,
-          expectedExceptionsMessageRegExp = "No current path")
+            expectedExceptionsMessageRegExp = "No current path")
     public void illegal_noCurrentPath() {
         $(null);
     }
@@ -195,7 +199,7 @@ public class BeanPathMagicTest {
         try {
             $(person.getName().getBytes()); // getName() returns String, which is a final class
             fail();
-        } catch (NullPointerException e) {
+        } catch (NullPointerException ignored) {
         }
 
         // because The Framework cannot mock final classes (including String, all primitive wrappers, enums and arrays)
@@ -207,8 +211,14 @@ public class BeanPathMagicTest {
     }
 
     public static class ParanoidPerson {
-        private String getSecrete() { return "The Secrete"; }
 
+        private String getSecret() {
+            return "The Secret";
+        }
+
+        public final String getFinalSecret() {
+            return "The Final Secret";
+        }
     }
 
     @Test
@@ -220,13 +230,25 @@ public class BeanPathMagicTest {
         // (although visible here, but not visible to the Framework)
 
         try {
-            $(paranoidPerson.getSecrete());
+            $(paranoidPerson.getSecret());
             fail();
-        } catch (BeanPathMagicException x) {
+        } catch (BeanPathMagicException ignored) {
         }
 
         // Such invocation just fall through to the real method
 
-        assertEquals(paranoidPerson.getSecrete(), "The Secrete");
+        assertEquals(paranoidPerson.getSecret(), "The Secrete");
+    }
+
+    @Test(expectedExceptions = BeanPathMagicException.class)
+    public void illegal_finalMethod() {
+
+        ParanoidPerson paranoidPerson = root(ParanoidPerson.class);
+        assertEquals(paranoidPerson.getFinalSecret(), "The Final Secret");
+
+        // The Framework cannot intercept private method invocation
+        // (although visible here, but not visible to the Framework)
+
+        $(paranoidPerson.getFinalSecret());
     }
 }
