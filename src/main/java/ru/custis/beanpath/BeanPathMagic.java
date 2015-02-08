@@ -49,7 +49,7 @@ public class BeanPathMagic {
     public static @Nonnull <T> BeanPath<T> $(T callChain) {
         final BeanPath<?> path = CurrentPath.evict();
         if (path == null) {
-            throw new BeanPathMagicException("No current path");
+            throw new BeanPathMagicException("No current path. Probably, call your chain consists a final method.");
         }
         return (BeanPath<T>) path;
     }
