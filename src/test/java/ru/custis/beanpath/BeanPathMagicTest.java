@@ -198,7 +198,7 @@ public class BeanPathMagicTest {
 
         try {
             $(person.getName().getBytes()); // getName() returns String, which is a final class
-            fail("Can't mock final class [");
+            fail();
         } catch (NullPointerException ignored) {
         }
 
