@@ -80,6 +80,7 @@ public class MockMakerTest {
         assertTrue(wasInvoked[0]);
     }
 
+    @SuppressWarnings({"ObjectEqualsNull", "EqualsWithItself"})
     @Test
     public void equalsMethodImplementation() throws Exception {
 

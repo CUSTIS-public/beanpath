@@ -45,15 +45,16 @@ public abstract class TypeLiteral<T> {
 
     protected TypeLiteral() {
 
-        final Type genericSuperclass = this.getClass().getGenericSuperclass();
+        final Type genericSuperclass = getClass().getGenericSuperclass();
 
         if (genericSuperclass instanceof Class) {
             throw new IllegalArgumentException("Missing type argument");
         }
 
-        this.capturedType = ((ParameterizedType) genericSuperclass).getActualTypeArguments()[0];
+        capturedType = ((ParameterizedType) genericSuperclass).getActualTypeArguments()[0];
     }
 
+    @SuppressWarnings("unchecked")
     /*package-local*/ TypeToken<T> toTypeToken() {
         return (TypeToken<T>) TypeToken.of(capturedType);
     }

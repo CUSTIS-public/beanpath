@@ -23,6 +23,7 @@ import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.lang.Character.isUpperCase;
@@ -62,7 +63,7 @@ public class BeanPathMagic {
 
     private static class Mocker {
 
-        private static final ConcurrentHashMap<TypeToken, Object> cache = new ConcurrentHashMap<TypeToken, Object>();
+        private static final Map<TypeToken, Object> cache = new ConcurrentHashMap<TypeToken, Object>();
         private static final Object mockCreationGuard = new Object();
 
         @SuppressWarnings("unchecked")

@@ -98,7 +98,7 @@ import java.util.concurrent.atomic.AtomicLong;
         }
     }
 
-    private static InvocationHandler defaultObjectMethodsHandler = new InvocationHandler() {
+    private static final InvocationHandler defaultObjectMethodsHandler = new InvocationHandler() {
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             if (MethodsGuru.isEqualsMethod(method)) {
@@ -112,7 +112,7 @@ import java.util.concurrent.atomic.AtomicLong;
         }
     };
 
-    private static abstract class MethodsGuru {
+    private abstract static class MethodsGuru {
 
         public static boolean isEqualsHashCodeOrToStringMethod(Method method) {
             return isEqualsMethod(method) || isHashCodeMethod(method) || isToStringMethod(method);

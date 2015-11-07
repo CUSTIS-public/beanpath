@@ -70,7 +70,7 @@ public class BeanPathMagicTest {
         }));
     }
 
-    public static abstract class Uninstantaible {
+    public abstract static class Uninstantaible {
 
         private Uninstantaible() {
             throw new AssertionError();

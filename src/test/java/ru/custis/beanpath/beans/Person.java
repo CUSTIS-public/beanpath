@@ -19,6 +19,7 @@ package ru.custis.beanpath.beans;
 import java.util.Iterator;
 import java.util.List;
 
+@SuppressWarnings("UnusedParameters")
 public class Person extends Identified<Long> {
 
     public String getName() { return "John Smith"; }

@@ -16,6 +16,7 @@
 
 package ru.custis.beanpath.beans;
 
+@SuppressWarnings("unused")
 public enum Gender {
 
     MALE, FEMALE

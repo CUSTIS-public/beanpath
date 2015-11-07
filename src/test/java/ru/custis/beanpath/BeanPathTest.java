@@ -28,6 +28,7 @@ import static org.testng.Assert.*;
 
 public class BeanPathTest {
 
+    @SuppressWarnings("ConstantConditions")
     @Test
     public void basic() {
 
