@@ -17,7 +17,7 @@
 package ru.custis.beanpath;
 
 import com.google.common.reflect.TypeToken;
-import net.sf.cglib.proxy.InvocationHandler;
+import ru.custis.beanpath.MockMaker.InvocationCallback;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
@@ -84,7 +84,7 @@ public class BeanPathMagic {
             return (T) mock;
         }
 
-        private static class MockInvocationHandler implements InvocationHandler {
+        private static class MockInvocationHandler implements InvocationCallback {
             // rawMockType can be inferred from mockType,
             // but TypeToken.getRawType() is relatively slow,
             // so avoid it in time critical invoke()

@@ -18,7 +18,12 @@ package ru.custis.beanpath;
 
 import net.sf.cglib.core.NamingPolicy;
 import net.sf.cglib.core.Predicate;
-import net.sf.cglib.proxy.*;
+import net.sf.cglib.proxy.Callback;
+import net.sf.cglib.proxy.CallbackFilter;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.Factory;
+import net.sf.cglib.proxy.InvocationHandler;
+import net.sf.cglib.proxy.NoOp;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -27,7 +32,12 @@ import java.util.concurrent.atomic.AtomicLong;
 /*package-local*/ class MockMaker {
     private MockMaker() {} // static use only
 
-    public static <T> T createMock(Class<T> type, InvocationHandler handler) throws InstantiationException {
+    public interface InvocationCallback extends InvocationHandler {
+        @Override
+        Object invoke(Object proxy, Method method, Object[] args) throws Throwable;
+    }
+
+    public static <T> T createMock(Class<T> type, InvocationCallback handler) throws InstantiationException {
         Assert.notNull(type, "type");
         Assert.notNull(handler, "handler");
 

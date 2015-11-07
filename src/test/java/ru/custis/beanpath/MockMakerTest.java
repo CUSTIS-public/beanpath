@@ -16,8 +16,8 @@
 
 package ru.custis.beanpath;
 
-import net.sf.cglib.proxy.InvocationHandler;
 import org.testng.annotations.Test;
+import ru.custis.beanpath.MockMaker.InvocationCallback;
 import ru.custis.beanpath.beans.Person;
 
 import java.lang.reflect.Method;
@@ -26,7 +26,7 @@ import java.util.concurrent.Callable;
 import static org.testng.Assert.*;
 
 public class MockMakerTest {
-    private static final InvocationHandler errorThrowingHandler = new InvocationHandler() {
+    private static final InvocationCallback errorThrowingHandler = new InvocationCallback() {
         @Override public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             throw new AssertionError();
         }
@@ -56,7 +56,7 @@ public class MockMakerTest {
     public void bridgeMethodDelegation() throws Exception {
         final boolean[] wasInvoked = new boolean[]{false};
 
-        final MyStringCallable mock = MockMaker.createMock(MyStringCallable.class, new InvocationHandler() {
+        final MyStringCallable mock = MockMaker.createMock(MyStringCallable.class, new InvocationCallback() {
             @Override public Object invoke(Object proxy, Method method, Object[] args) {
                 assertEquals(method.getDeclaringClass(), MyStringCallable.class);
 
