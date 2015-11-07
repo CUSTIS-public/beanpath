@@ -96,7 +96,7 @@ public class MockMakerTest {
     public void toStringMethodImplementation() throws Exception {
         final Person mock = MockMaker.createMock(Person.class, errorThrowingHandler);
 
-        assertTrue(mock.toString().startsWith("ru.custis.beanpath.BeanPathMagicMock_of_" + Person.class.getName()));
+        assertTrue(mock.toString().startsWith(mock.getClass().getName()));
         assertTrue(mock.toString().contains("@"));
     }
 }
