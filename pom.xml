@@ -58,18 +58,10 @@
                                     <include>org.ow2.asm:*</include>
                                 </includes>
                             </artifactSet>
-                            <filters>
-                                <filter>
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/beans.xml</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
                             <relocations>
                                 <relocation>
-                                    <pattern>com.google.common</pattern>
-                                    <shadedPattern>ru.custis.beanpath.shaded.com.google.common</shadedPattern>
+                                    <pattern>com.google</pattern>
+                                    <shadedPattern>ru.custis.beanpath.shaded.com.google</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>net.sf.cglib</pattern>
@@ -97,7 +89,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>15.0</version>
+            <version>18.0</version>
         </dependency>
 
         <!-- CGLIB with dependencies  -->
