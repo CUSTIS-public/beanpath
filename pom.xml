@@ -4,7 +4,7 @@
 
     <groupId>ru.custis.beanpath</groupId>
     <artifactId>beanpath</artifactId>
-    <version>1.0.1</version>
+    <version>1.1</version>
     <packaging>jar</packaging>
 
     <name>CUSTIS beanpath</name>
@@ -54,8 +54,7 @@
                             <artifactSet>
                                 <includes>
                                     <include>com.google.guava:*</include>
-                                    <include>cglib:*</include>
-                                    <include>org.ow2.asm:*</include>
+                                    <include>net.bytebuddy:*</include>
                                 </includes>
                             </artifactSet>
                             <relocations>
@@ -64,12 +63,8 @@
                                     <shadedPattern>ru.custis.beanpath.shaded.com.google</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>net.sf.cglib</pattern>
-                                    <shadedPattern>ru.custis.beanpath.shaded.net.sf.cglib</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.objectweb.asm</pattern>
-                                    <shadedPattern>ru.custis.beanpath.shaded.org.objectweb.asm</shadedPattern>
+                                    <pattern>net.bytebuddy</pattern>
+                                    <shadedPattern>ru.custis.beanpath.shaded.net.bytebuddy</shadedPattern>
                                 </relocation>
                             </relocations>
                             <transformers>
@@ -85,23 +80,18 @@
 
     <dependencies>
 
-        <!-- TypeToken and type resolution mechanism  -->
+        <!-- TypeToken and type resolution mechanism -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>18.0</version>
         </dependency>
 
-        <!-- CGLIB with dependencies  -->
+        <!-- ByteBuddy -->
         <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-            <version>3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.ow2.asm</groupId>
-            <artifactId>asm-util</artifactId>
-            <version>4.0</version>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>0.7-rc6</version>
         </dependency>
 
         <!-- Syntactic sugar -->

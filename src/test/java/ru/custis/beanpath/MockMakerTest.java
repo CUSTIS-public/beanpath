@@ -64,10 +64,6 @@ public class MockMakerTest {
                 assertEquals(method.getDeclaringClass(), MyStringCallable.class);
                 assertEquals(method, expectedMethod);
 
-                StackTraceElement bridgeMethodStackTraceElement = new Exception().getStackTrace()[2];
-                assertEquals(bridgeMethodStackTraceElement.getClassName(), MyStringCallable.class.getName());
-                assertEquals(bridgeMethodStackTraceElement.getMethodName(), "call");
-
                 callbackInvoked.set(true);
 
                 return null;
