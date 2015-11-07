@@ -40,11 +40,9 @@ import java.lang.reflect.Type;
  * embeds in type hierarchy and become available at runtime.
  */
 public abstract class TypeLiteral<T> {
-
     private final Type capturedType;
 
     protected TypeLiteral() {
-
         final Type genericSuperclass = getClass().getGenericSuperclass();
 
         if (genericSuperclass instanceof Class) {

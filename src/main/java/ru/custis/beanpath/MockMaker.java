@@ -28,7 +28,6 @@ import java.util.concurrent.atomic.AtomicLong;
     private MockMaker() {} // static use only
 
     public static <T> T createMock(Class<T> type, InvocationHandler handler) throws Exception {
-
         Assert.notNull(type, "type");
         Assert.notNull(handler, "handler");
 
@@ -42,7 +41,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
     @SuppressWarnings("unchecked")
     private static <T> Class<T> generateClass(Class<T> clazzToMock) {
-
         final Enhancer enhancer = new Enhancer() {
             @Override protected void filterConstructors(Class sc, List constructors) {
                 // Don't filter; because default implementation filters out
@@ -83,7 +81,6 @@ import java.util.concurrent.atomic.AtomicLong;
     private static final Class[] CALLBACK_TYPES = new Class[]{InvocationHandler.class, NoOp.class, InvocationHandler.class};
 
     private static class MockCallbackFilter implements CallbackFilter {
-
         public static final MockCallbackFilter INSTANCE = new MockCallbackFilter();
 
         @Override
@@ -113,7 +110,6 @@ import java.util.concurrent.atomic.AtomicLong;
     };
 
     private abstract static class MethodsGuru {
-
         public static boolean isEqualsHashCodeOrToStringMethod(Method method) {
             return isEqualsMethod(method) || isHashCodeMethod(method) || isToStringMethod(method);
         }

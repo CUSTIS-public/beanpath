@@ -17,6 +17,5 @@
 package ru.custis.beanpath.beans;
 
 public abstract class Identified<ID> {
-
     public ID getId() { return null; }
 }

@@ -62,7 +62,6 @@ public class BeanPathMagic {
     // --------------------------------------------------------- Implementation
 
     private static class Mocker {
-
         private static final Map<TypeToken, Object> cache = new ConcurrentHashMap<TypeToken, Object>();
         private static final Object mockCreationGuard = new Object();
 
@@ -86,7 +85,6 @@ public class BeanPathMagic {
         }
 
         private static class MockInvocationHandler implements InvocationHandler {
-
             // rawMockType can be inferred from mockType,
             // but TypeToken.getRawType() is relatively slow,
             // so avoid it in time critical invoke()
@@ -101,7 +99,6 @@ public class BeanPathMagic {
 
             @Override
             public Object invoke(Object target, Method method, Object[] args) throws Throwable {
-
                 CurrentPath.initIfNotAlready(rawMockType);
 
                 final Type genericReturnType = method.getGenericReturnType();
@@ -138,7 +135,6 @@ public class BeanPathMagic {
     }
 
     private static class CurrentPath {
-
         private static final ThreadLocal<BeanPath<?>> currentPathTL = new ThreadLocal<BeanPath<?>>();
 
         public static void initIfNotAlready(Class<?> clazz) {
@@ -161,11 +157,9 @@ public class BeanPathMagic {
     }
 
     private static class NameUtils {
-
         private static final String IS = "is", GET = "get";
 
         public static String stripGetIsPrefixIfAny(final String name) {
-
             assert (name != null);
 
             if (name.length() > GET.length() && name.startsWith(GET) && isUpperCase(name.charAt(GET.length()))) {
@@ -177,7 +171,6 @@ public class BeanPathMagic {
         }
 
         private static String stripAndDecapitalize(String name, String prefix) {
-
             final int nameLength = name.length();
             final int prefixLength = prefix.length();
             final int i = prefixLength + 1;

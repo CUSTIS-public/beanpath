@@ -26,7 +26,6 @@ import java.util.concurrent.Callable;
 import static org.testng.Assert.*;
 
 public class MockMakerTest {
-
     private static final InvocationHandler errorThrowingHandler = new InvocationHandler() {
         @Override public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             throw new AssertionError();
@@ -35,14 +34,12 @@ public class MockMakerTest {
 
     @Test
     public void creatingSeveralMocksOfSameType() throws Exception {
-
         MockMaker.createMock(Person.class, errorThrowingHandler);
         MockMaker.createMock(Person.class, errorThrowingHandler);
     }
 
     @Test
     public void namingPolicy() throws Exception {
-
         final Person mock = MockMaker.createMock(Person.class, errorThrowingHandler);
 
         final String mockClassName = mock.getClass().getName();
@@ -57,7 +54,6 @@ public class MockMakerTest {
 
     @Test
     public void bridgeMethodDelegation() throws Exception {
-
         final boolean[] wasInvoked = new boolean[]{false};
 
         final MyStringCallable mock = MockMaker.createMock(MyStringCallable.class, new InvocationHandler() {
@@ -83,7 +79,6 @@ public class MockMakerTest {
     @SuppressWarnings({"ObjectEqualsNull", "EqualsWithItself"})
     @Test
     public void equalsMethodImplementation() throws Exception {
-
         final Person mock = MockMaker.createMock(Person.class, errorThrowingHandler);
 
         assertTrue(mock.equals(mock));
@@ -93,7 +88,6 @@ public class MockMakerTest {
 
     @Test
     public void hashCodeMethodImplementation() throws Exception {
-
         final Person mock = MockMaker.createMock(Person.class, errorThrowingHandler);
 
         assertEquals(mock.hashCode(), mock.hashCode());
@@ -101,7 +95,6 @@ public class MockMakerTest {
 
     @Test
     public void toStringMethodImplementation() throws Exception {
-
         final Person mock = MockMaker.createMock(Person.class, errorThrowingHandler);
 
         assertTrue(mock.toString().startsWith("ru.custis.beanpath.BeanPathMagicMock_of_" + Person.class.getName()));

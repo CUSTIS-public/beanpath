@@ -17,7 +17,6 @@
 package ru.custis.beanpath.beans;
 
 public class NamesBean {
-
     public Object getProperty() { return null; }
 
     public Object isProperty() { return null; }

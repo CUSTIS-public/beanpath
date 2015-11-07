@@ -21,7 +21,6 @@ import java.util.List;
 
 @SuppressWarnings("UnusedParameters")
 public class Person extends Identified<Long> {
-
     public String getName() { return "John Smith"; }
 
     public int getAge() { return 27; }
