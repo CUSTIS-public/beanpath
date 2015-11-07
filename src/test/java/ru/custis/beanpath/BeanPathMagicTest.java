@@ -184,7 +184,7 @@ public class BeanPathMagicTest {
      */
 
     @Test(expectedExceptions = BeanPathMagicException.class,
-            expectedExceptionsMessageRegExp = "No current path")
+            expectedExceptionsMessageRegExp = "No current path.*")
     public void illegal_noCurrentPath() {
         $(null);
     }
@@ -237,7 +237,7 @@ public class BeanPathMagicTest {
 
         // Such invocation just fall through to the real method
 
-        assertEquals(paranoidPerson.getSecret(), "The Secrete");
+        assertEquals(paranoidPerson.getSecret(), "The Secret");
     }
 
     @Test(expectedExceptions = BeanPathMagicException.class)
