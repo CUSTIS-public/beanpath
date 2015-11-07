@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /*package-local*/ class MockMaker {
     private MockMaker() {} // static use only
 
-    public static <T> T createMock(Class<T> type, InvocationHandler handler) throws Exception {
+    public static <T> T createMock(Class<T> type, InvocationHandler handler) throws InstantiationException {
         Assert.notNull(type, "type");
         Assert.notNull(handler, "handler");
 

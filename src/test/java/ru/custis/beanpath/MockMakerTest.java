@@ -47,7 +47,7 @@ public class MockMakerTest {
     }
 
     public static class MyStringCallable implements Callable<String> {
-        @Override public String call() throws Exception {
+        @Override public String call() {
             return null;
         }
     }
@@ -57,8 +57,7 @@ public class MockMakerTest {
         final boolean[] wasInvoked = new boolean[]{false};
 
         final MyStringCallable mock = MockMaker.createMock(MyStringCallable.class, new InvocationHandler() {
-            @Override public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-
+            @Override public Object invoke(Object proxy, Method method, Object[] args) {
                 assertEquals(method.getDeclaringClass(), MyStringCallable.class);
 
                 final StackTraceElement bridgeMethodStackTraceElement = new Exception().getStackTrace()[2];
