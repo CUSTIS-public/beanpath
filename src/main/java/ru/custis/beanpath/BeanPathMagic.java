@@ -32,8 +32,8 @@ import static java.lang.Character.isUpperCase;
 /**
  * This is where all the magic resides :-)
  */
-public class BeanPathMagic {
-    private BeanPathMagic() {} // static use only
+public final class BeanPathMagic {
+    private BeanPathMagic() {}
 
     @SuppressWarnings("unchecked")
     public static @Nonnull <T> T root(@Nonnull Class<T> clazz) {
@@ -60,9 +60,7 @@ public class BeanPathMagic {
         return $(callChain).toDotDelimitedString();
     }
 
-    // --------------------------------------------------------- Implementation
-
-    private static class Mocker {
+    private static final class Mocker {
         private static final Map<TypeToken, Object> cache = new ConcurrentHashMap<TypeToken, Object>();
         private static final Object mockCreationGuard = new Object();
 
@@ -135,7 +133,7 @@ public class BeanPathMagic {
         }
     }
 
-    private static class CurrentPath {
+    private static final class CurrentPath {
         private static final ThreadLocal<BeanPath<?>> currentPathTL = new ThreadLocal<BeanPath<?>>();
 
         public static void initIfNotAlready(Class<?> clazz) {
@@ -157,7 +155,7 @@ public class BeanPathMagic {
         }
     }
 
-    private static class NameUtils {
+    private static final class NameUtils {
         private static final String IS = "is", GET = "get";
 
         public static String stripGetIsPrefixIfAny(final String name) {

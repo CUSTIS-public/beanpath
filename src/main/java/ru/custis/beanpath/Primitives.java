@@ -18,8 +18,8 @@ package ru.custis.beanpath;
 
 import javax.annotation.Nullable;
 
-/*package-local*/ class Primitives {
-    private Primitives() {} // static use only
+final class Primitives {
+    private Primitives() {}
 
     private static final Prm[] PRIMITIVES = Prm.values();
 

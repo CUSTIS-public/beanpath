@@ -37,8 +37,8 @@ import static net.bytebuddy.matcher.ElementMatchers.not;
 import static net.bytebuddy.matcher.ElementMatchers.returns;
 import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 
-/*package-local*/ class MockMaker {
-    private MockMaker() {} // static use only
+final class MockMaker {
+    private MockMaker() {}
 
     public interface InvocationCallback {
         Object invoke(Object proxy, Method method, Object[] args) throws Throwable;
@@ -108,7 +108,7 @@ import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
     }
 
     @SuppressWarnings("unused")
-    public static class ObjectMethodsHandler {
+    public static final class ObjectMethodsHandler {
         private ObjectMethodsHandler() {}
 
         public static boolean equalsHandler(@This Object thiz, @Argument(0) Object that) {
