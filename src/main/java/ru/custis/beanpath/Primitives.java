@@ -16,13 +16,12 @@
 
 package ru.custis.beanpath;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
 import javax.annotation.Nullable;
 
 /*package-local*/ class Primitives {
     private Primitives() {} // static use only
+
+    private static final Prm[] PRIMITIVES = Prm.values();
 
     @SuppressWarnings("unchecked")
     public static <T> Class<T> getWrapperClass(Class<T> type) {
@@ -35,19 +34,19 @@ import javax.annotation.Nullable;
     }
 
     private static Prm findPrm(Class<?> type) {
-        for (Prm p : Prm.VALUES) {
-            if (p.type == type) {
+        for (Prm p : PRIMITIVES) {
+            if (p.getType() == type) {
                 return p;
             }
         }
         throw new IllegalArgumentException(
                 (type != null) ? "Not a primitive: " + type
-                               : "Parameter 'type' must not be null");
+                               : "Parameter 'type' must not be null"
+        );
     }
 
-    @RequiredArgsConstructor
-    @Getter
-    private static enum Prm {
+    @SuppressWarnings("unused")
+    private enum Prm {
         BOOLEAN(boolean.class, Boolean.class, false),
         CHAR(char.class, Character.class, '\u0000'),
         BYTE(byte.class, Byte.class, (byte) 0),
@@ -58,10 +57,26 @@ import javax.annotation.Nullable;
         DOUBLE(double.class, Double.class, 0D),
         VOID(void.class, Void.class, null);
 
-        private static final Prm[] VALUES = Prm.values();
-
         private final Class<?> type;
         private final Class<?> wrapperClass;
         private final Object defaultValue;
+
+        Prm(Class<?> type, Class<?> wrapperClass, Object defaultValue) {
+            this.type = type;
+            this.wrapperClass = wrapperClass;
+            this.defaultValue = defaultValue;
+        }
+
+        Class<?> getType() {
+            return type;
+        }
+
+        Class<?> getWrapperClass() {
+            return wrapperClass;
+        }
+
+        Object getDefaultValue() {
+            return defaultValue;
+        }
     }
 }
