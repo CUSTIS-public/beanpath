@@ -26,6 +26,7 @@ import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.Character.isUpperCase;
 
 /**
@@ -36,13 +37,13 @@ public class BeanPathMagic {
 
     @SuppressWarnings("unchecked")
     public static @Nonnull <T> T root(@Nonnull Class<T> clazz) {
-        Assert.notNull(clazz, "clazz");
+        checkNotNull(clazz, "Argument 'clazz' must not be null");
         return (T) Mocker.mock(TypeToken.of(clazz));
     }
 
     @SuppressWarnings("unchecked")
     public static @Nonnull <T> T root(@Nonnull TypeLiteral<T> type) {
-        Assert.notNull(type, "type");
+        checkNotNull(type, "Argument 'type' must not be null");
         return (T) Mocker.mock(type.toTypeToken());
     }
 

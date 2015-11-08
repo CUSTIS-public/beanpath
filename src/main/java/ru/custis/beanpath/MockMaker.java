@@ -27,6 +27,7 @@ import net.bytebuddy.implementation.bind.annotation.This;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static net.bytebuddy.dynamic.loading.ClassLoadingStrategy.Default.WRAPPER;
 import static net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy.Default.NO_CONSTRUCTORS;
 import static net.bytebuddy.implementation.MethodDelegation.to;
@@ -44,8 +45,8 @@ import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
     }
 
     public static <T> T createMock(Class<T> type, InvocationCallback handler) throws InstantiationException {
-        Assert.notNull(type, "type");
-        Assert.notNull(handler, "handler");
+        checkNotNull(type, "Argument 'type' must not be null");
+        checkNotNull(handler, "Argument 'handler' must not be null");
 
         final Class<? extends T> mockClass = generateClass(type, handler);
         final Object mock = instantiateClass(mockClass);
