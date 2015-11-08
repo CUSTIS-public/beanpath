@@ -17,14 +17,20 @@
 package ru.custis.beanpath;
 
 
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.util.Iterator;
 
-import static org.testng.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 public class BeanPathTest {
     @SuppressWarnings("ConstantConditions")
@@ -33,10 +39,10 @@ public class BeanPathTest {
         final BeanPath<DatabaseMetaData> path =
                 BeanPath.root(DataSource.class).append("connection", Connection.class).append("metaData", DatabaseMetaData.class);
 
-        assertPathIs(path, "metaData", DatabaseMetaData.class, false);
-        assertPathIs(path.getParent(), "connection", Connection.class, false);
-        assertPathIs(path.getParent().getParent(), "<root>", DataSource.class, true);
-        assertEquals(path.getParent().getParent().getParent(), null);
+        assertPathIs("metaData", DatabaseMetaData.class, false, path);
+        assertPathIs("connection", Connection.class, false, path.getParent());
+        assertPathIs("<root>", DataSource.class, true, path.getParent().getParent());
+        assertNull(path.getParent().getParent().getParent());
     }
 
     @Test
@@ -54,8 +60,8 @@ public class BeanPathTest {
 
         assertTrue(root.isRoot());
         assertFalse(root.hasParent());
-        assertPathIs(root, "<root>", DataSource.class, true);
-        assertEquals(root.getParent(), null);
+        assertPathIs("<root>", DataSource.class, true, root);
+        assertNull(root.getParent());
         assertSame(root, root.getRoot());
     }
 
@@ -64,10 +70,10 @@ public class BeanPathTest {
         final BeanPath<DatabaseMetaData> path =
                 BeanPath.root(DataSource.class).append("connection", Connection.class).append("metaData", DatabaseMetaData.class);
 
-        assertEquals(path.toDotDelimitedString(), "connection.metaData");
+        assertEquals("connection.metaData", path.toDotDelimitedString());
         assertSame(path.toDotDelimitedString(), path.toDotDelimitedString());
 
-        assertEquals(path.getRoot().toDotDelimitedString(), "");
+        assertEquals("", path.getRoot().toDotDelimitedString());
     }
 
     @Test
@@ -77,11 +83,11 @@ public class BeanPathTest {
 
         final Iterator<BeanPath<?>> iterator = path.iterator();
         assertTrue(iterator.hasNext());
-        assertPathIs(iterator.next(), "<root>", DataSource.class, true);
+        assertPathIs("<root>", DataSource.class, true, iterator.next());
         assertTrue(iterator.hasNext());
-        assertPathIs(iterator.next(), "connection", Connection.class, false);
+        assertPathIs("connection", Connection.class, false, iterator.next());
         assertTrue(iterator.hasNext());
-        assertPathIs(iterator.next(), "metaData", DatabaseMetaData.class, false);
+        assertPathIs("metaData", DatabaseMetaData.class, false, iterator.next());
         assertFalse(iterator.hasNext());
     }
 
@@ -91,8 +97,8 @@ public class BeanPathTest {
         final BeanPath<String> samePath = BeanPath.root(Object.class).append("foo", String.class);
         final BeanPath<String> otherPath = BeanPath.root(Object.class).append("bar", String.class);
 
-        assertNotEquals(somePath, null);
-        assertNotEquals(somePath, new Object());
+        assertNotNull(somePath);
+        assertNotEquals(new Object(), somePath);
 
         assertEquals(somePath, somePath);
         assertEquals(somePath, samePath);
@@ -107,13 +113,13 @@ public class BeanPathTest {
         final BeanPath<DatabaseMetaData> path =
                 BeanPath.root(DataSource.class).append("connection", Connection.class).append("metaData", DatabaseMetaData.class);
 
-        assertEquals(path.toString(), "<root>:DataSource/connection:Connection/metaData:DatabaseMetaData");
+        assertEquals("<root>:DataSource/connection:Connection/metaData:DatabaseMetaData", path.toString());
         assertSame(path.toString(), path.toString());
     }
 
-    private static void assertPathIs(BeanPath path, String name, Class type, boolean isRoot) {
-        assertEquals(path.getName(), name);
-        assertEquals(path.getType(), type);
-        assertEquals(path.isRoot(), isRoot);
+    private static void assertPathIs(String name, Class type, boolean isRoot, BeanPath path) {
+        assertEquals(name, path.getName());
+        assertEquals(type, path.getType());
+        assertEquals(isRoot, path.isRoot());
     }
 }

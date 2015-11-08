@@ -17,11 +17,21 @@
 package ru.custis.beanpath;
 
 
-import org.testng.annotations.Test;
-import ru.custis.beanpath.beans.*;
+import org.junit.Test;
+import ru.custis.beanpath.beans.Document;
+import ru.custis.beanpath.beans.Gender;
+import ru.custis.beanpath.beans.Identified;
+import ru.custis.beanpath.beans.NamesBean;
+import ru.custis.beanpath.beans.Person;
+import ru.custis.beanpath.beans.PrimitiveBean;
 
-import static org.testng.Assert.*;
-import static ru.custis.beanpath.BeanPathMagic.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
+import static ru.custis.beanpath.BeanPathMagic.$;
+import static ru.custis.beanpath.BeanPathMagic.$$;
+import static ru.custis.beanpath.BeanPathMagic.root;
 
 public class BeanPathMagicTest {
     /*
@@ -33,27 +43,22 @@ public class BeanPathMagicTest {
         final Person person = root(Person.class);
 
         // String property
-        assertEquals($(person.getName()),
-                BeanPath.root(Person.class).append("name", String.class));
+        assertEquals(BeanPath.root(Person.class).append("name", String.class), $(person.getName()));
 
         // nested property
-        assertEquals($(person.getDocument().getNumber()),
-                BeanPath.root(Person.class).append("document", Document.class).append("number", String.class));
+        assertEquals(BeanPath.root(Person.class).append("document", Document.class).append("number", String.class), $(person.getDocument().getNumber()));
 
         // primitive property
-        assertEquals($(person.getAge()),
-                BeanPath.root(Person.class).append("age", Integer.class));
+        assertEquals(BeanPath.root(Person.class).append("age", Integer.class), $(person.getAge()));
 
         // enum property
-        assertEquals($(person.getGender()),
-                BeanPath.root(Person.class).append("gender", Gender.class));
+        assertEquals(BeanPath.root(Person.class).append("gender", Gender.class), $(person.getGender()));
 
         // recursive property
-        assertEquals($(person.getBestFriend().getName()),
-                BeanPath.root(Person.class).append("bestFriend", Person.class).append("name", String.class));
+        assertEquals(BeanPath.root(Person.class).append("bestFriend", Person.class).append("name", String.class), $(person.getBestFriend().getName()));
 
         // double-dollar shortcut
-        assertEquals($$(person.getDocument().getIssuedBy()), "document.issuedBy");
+        assertEquals("document.issuedBy", $$(person.getDocument().getIssuedBy()));
     }
 
     @Test
@@ -62,9 +67,7 @@ public class BeanPathMagicTest {
 
         assertSame(root(Person.class), root(Person.class));
         assertSame(root(Document.class), root(Document.class));
-        assertSame(root(new TypeLiteral<Identified<?>>() {
-        }), root(new TypeLiteral<Identified<?>>() {
-        }));
+        assertSame(root(new TypeLiteral<Identified<?>>() {}), root(new TypeLiteral<Identified<?>>() {}));
     }
 
     public abstract static class Uninstantaible {
@@ -89,18 +92,18 @@ public class BeanPathMagicTest {
         // Java Bean style properties converts appropriately
 
         final NamesBean names = root(NamesBean.class);
-        assertEquals($(names.getProperty()).getName(), "property"); // 'get' prefix
-        assertEquals($(names.isProperty()).getName(), "property"); // 'is' prefix
-        assertEquals($(names.getA()).getName(), "a"); // notice lowercase 'a'
-        assertEquals($(names.getUTC()).getName(), "UTC"); // notice 'UTC' in uppercase
+        assertEquals("property", $(names.getProperty()).getName()); // 'get' prefix
+        assertEquals("property", $(names.isProperty()).getName()); // 'is' prefix
+        assertEquals("a", $(names.getA()).getName()); // notice lowercase 'a'
+        assertEquals("UTC", $(names.getUTC()).getName()); // notice 'UTC' in uppercase
 
         // otherwise lives unchanged
 
-        assertEquals($(names.property()).getName(), "property"); // no prefix
-        assertEquals($(names.is()).getName(), "is");  // 'prefix' only
-        assertEquals($(names.get()).getName(), "get"); // 'prefix' only
-        assertEquals($(names.getting()).getName(), "getting"); // looks like prefix but it's not
-        assertEquals($(names.isabel()).getName(), "isabel"); // looks like prefix but it's not
+        assertEquals("property", $(names.property()).getName()); // no prefix
+        assertEquals("is", $(names.is()).getName());  // 'prefix' only
+        assertEquals("get", $(names.get()).getName()); // 'prefix' only
+        assertEquals("getting", $(names.getting()).getName()); // looks like prefix but it's not
+        assertEquals("isabel", $(names.isabel()).getName()); // looks like prefix but it's not
     }
 
     @Test
@@ -108,16 +111,16 @@ public class BeanPathMagicTest {
         // Primitive types promotes to their corresponding wrapper types
 
         final PrimitiveBean primitives = root(PrimitiveBean.class);
-        assertEquals($(primitives.getBoolean()).getType(), Boolean.class);
-        assertEquals($(primitives.getChar()).getType(), Character.class);
-        assertEquals($(primitives.getByte()).getType(), Byte.class);
-        assertEquals($(primitives.getShort()).getType(), Short.class);
-        assertEquals($(primitives.getInt()).getType(), Integer.class);
-        assertEquals($(primitives.getLong()).getType(), Long.class);
-        assertEquals($(primitives.getFloat()).getType(), Float.class);
-        assertEquals($(primitives.getDouble()).getType(), Double.class);
+        assertEquals(Boolean.class, $(primitives.getBoolean()).getType());
+        assertEquals(Character.class, $(primitives.getChar()).getType());
+        assertEquals(Byte.class, $(primitives.getByte()).getType());
+        assertEquals(Short.class, $(primitives.getShort()).getType());
+        assertEquals(Integer.class, $(primitives.getInt()).getType());
+        assertEquals(Long.class, $(primitives.getLong()).getType());
+        assertEquals(Float.class, $(primitives.getFloat()).getType());
+        assertEquals(Double.class, $(primitives.getDouble()).getType());
         primitives.getVoid();
-        assertEquals($((Void) null).getType(), Void.class);
+        assertEquals(Void.class, $((Void) null).getType());
     }
 
     /*
@@ -129,7 +132,7 @@ public class BeanPathMagicTest {
         final Person person = root(Person.class);
 
         // The Framework is smart enough to resolve actual type parameter
-        assertEquals($(person.getId()).getType(), Long.class);
+        assertEquals(Long.class, $(person.getId()).getType());
     }
 
     @Test
@@ -137,18 +140,17 @@ public class BeanPathMagicTest {
         final Person person = root(Person.class);
 
         // Wildcard type parameter erases to its upper bound...
-        assertEquals($(person.getNumbers().get(0)).getType(), Number.class);
+        assertEquals(Number.class, $(person.getNumbers().get(0)).getType());
 
         // ...that may be Object implicitly
-        assertEquals($(person.getStuff().next()).getType(), Object.class);
+        assertEquals(Object.class, $(person.getStuff().next()).getType());
     }
 
     @Test
     public void generics_TypeLiteralUsage() {
         // One can use TypeToken
-        final Identified<String> identified = root(new TypeLiteral<Identified<String>>() {
-        });
-        assertEquals($(identified.getId()).getType(), String.class);
+        final Identified<String> identified = root(new TypeLiteral<Identified<String>>() {});
+        assertEquals(String.class, $(identified.getId()).getType());
     }
 
     /*
@@ -158,23 +160,21 @@ public class BeanPathMagicTest {
     @Test
     public void awkward_propertyWithParameter() {
         final Person person = root(Person.class);
-        assertEquals($(person.withParam(0)),
-                BeanPath.root(Person.class).append("withParam", String.class));
+        assertEquals(BeanPath.root(Person.class).append("withParam", String.class), $(person.withParam(0)));
     }
 
     @Test
     public void awkward_voidReturnType() {
         root(Person.class).sleep();
         final BeanPath<Void> path = $((Void) null);
-        assertEquals(path, BeanPath.root(Person.class).append("sleep", Void.class));
+        assertEquals(BeanPath.root(Person.class).append("sleep", Void.class), path);
     }
 
     /*
      * Examples of illegal use
      */
 
-    @Test(expectedExceptions = BeanPathMagicException.class,
-            expectedExceptionsMessageRegExp = "No current path.*")
+    @Test(expected = BeanPathMagicException.class)
     public void illegal_noCurrentPath() {
         $(null);
     }
@@ -224,13 +224,13 @@ public class BeanPathMagicTest {
 
         // Such invocation just fall through to the real method
 
-        assertEquals(paranoidPerson.getSecret(), "The Secret");
+        assertEquals("The Secret", paranoidPerson.getSecret());
     }
 
-    @Test(expectedExceptions = BeanPathMagicException.class)
+    @Test(expected = BeanPathMagicException.class)
     public void illegal_finalMethod() {
         ParanoidPerson paranoidPerson = root(ParanoidPerson.class);
-        assertEquals(paranoidPerson.getFinalSecret(), "The Final Secret");
+        assertEquals("The Final Secret", paranoidPerson.getFinalSecret());
 
         // The Framework cannot intercept private method invocation
         // (although visible here, but not visible to the Framework)

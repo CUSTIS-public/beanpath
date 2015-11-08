@@ -16,7 +16,7 @@
 
 package ru.custis.beanpath;
 
-import org.testng.annotations.Test;
+import org.junit.Test;
 import ru.custis.beanpath.MockMaker.InvocationCallback;
 import ru.custis.beanpath.beans.Person;
 
@@ -24,7 +24,11 @@ import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.testng.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class MockMakerTest {
     private static final InvocationCallback errorThrowingHandler = new InvocationCallback() {
@@ -44,7 +48,7 @@ public class MockMakerTest {
         Person mock = MockMaker.createMock(Person.class, errorThrowingHandler);
 
         String mockClassName = mock.getClass().getName();
-        assertTrue(mockClassName.startsWith("ru.custis.beanpath.BeanPathMagicMock_of_" + Person.class.getName()), mockClassName);
+        assertTrue(mockClassName.startsWith("ru.custis.beanpath.BeanPathMagicMock_of_" + Person.class.getName()));
     }
 
     public static class MyStringCallable implements Callable<String> {
@@ -61,8 +65,8 @@ public class MockMakerTest {
 
         final MyStringCallable mock = MockMaker.createMock(MyStringCallable.class, new InvocationCallback() {
             @Override public Object invoke(Object proxy, Method method, Object[] args) {
-                assertEquals(method.getDeclaringClass(), MyStringCallable.class);
-                assertEquals(method, expectedMethod);
+                assertEquals(MyStringCallable.class, method.getDeclaringClass());
+                assertEquals(expectedMethod, method);
 
                 callbackInvoked.set(true);
 
