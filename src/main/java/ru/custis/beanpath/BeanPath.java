@@ -241,8 +241,7 @@ public class BeanPath<T> implements Iterable<BeanPath<?>>, Serializable {
 
     private StringBuilder toString(StringBuilder sb) {
         if (hasParent()) {
-            parent.toString(sb);
-            sb.append("/");
+            parent.toString(sb).append("/");
         }
         sb.append(name).append(':').append(type.getSimpleName());
         return sb;
