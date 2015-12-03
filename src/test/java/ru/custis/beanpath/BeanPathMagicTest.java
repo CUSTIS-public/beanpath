@@ -24,14 +24,12 @@ import static org.testng.Assert.*;
 import static ru.custis.beanpath.BeanPathMagic.*;
 
 public class BeanPathMagicTest {
-
     /*
      * Basic usage scenario
      */
 
     @Test
     public void basicUsage() {
-
         final Person person = root(Person.class);
 
         // String property
@@ -60,7 +58,6 @@ public class BeanPathMagicTest {
 
     @Test
     public void mockCaching() {
-
         // The Framework caches mock instances on its type basis for best performance
 
         assertSame(root(Person.class), root(Person.class));
@@ -70,8 +67,7 @@ public class BeanPathMagicTest {
         }));
     }
 
-    public static abstract class Uninstantaible {
-
+    public abstract static class Uninstantaible {
         private Uninstantaible() {
             throw new AssertionError();
         }
@@ -79,7 +75,6 @@ public class BeanPathMagicTest {
 
     @Test
     public void allocatingWithOutConstructorInvocation() {
-
         // The Framework allocates mock using sun.misc.Unsafe.allocateObject()
         // without constructor invocation
         root(Uninstantaible.class);
@@ -91,7 +86,6 @@ public class BeanPathMagicTest {
 
     @Test
     public void propertyNamingConcepts() {
-
         // Java Bean style properties converts appropriately
 
         final NamesBean names = root(NamesBean.class);
@@ -111,7 +105,6 @@ public class BeanPathMagicTest {
 
     @Test
     public void primitiveTypesWrapping() {
-
         // Primitive types promotes to their corresponding wrapper types
 
         final PrimitiveBean primitives = root(PrimitiveBean.class);
@@ -133,7 +126,6 @@ public class BeanPathMagicTest {
 
     @Test
     public void generics_actualTypeParameterResolution() {
-
         final Person person = root(Person.class);
 
         // The Framework is smart enough to resolve actual type parameter
@@ -142,7 +134,6 @@ public class BeanPathMagicTest {
 
     @Test
     public void generics_wildCardedTypes() {
-
         final Person person = root(Person.class);
 
         // Wildcard type parameter erases to its upper bound...
@@ -154,7 +145,6 @@ public class BeanPathMagicTest {
 
     @Test
     public void generics_TypeLiteralUsage() {
-
         // One can use TypeToken
         final Identified<String> identified = root(new TypeLiteral<Identified<String>>() {
         });
@@ -184,14 +174,13 @@ public class BeanPathMagicTest {
      */
 
     @Test(expectedExceptions = BeanPathMagicException.class,
-            expectedExceptionsMessageRegExp = "No current path")
+            expectedExceptionsMessageRegExp = "No current path.*")
     public void illegal_noCurrentPath() {
         $(null);
     }
 
     @Test
     public void illegal_finalClass() {
-
         final Person person = root(Person.class);
 
         // Attempt to track property of final class fails with NullPointerException
@@ -211,7 +200,6 @@ public class BeanPathMagicTest {
     }
 
     public static class ParanoidPerson {
-
         private String getSecret() {
             return "The Secret";
         }
@@ -223,7 +211,6 @@ public class BeanPathMagicTest {
 
     @Test
     public void illegal_privateMethod() {
-
         final ParanoidPerson paranoidPerson = root(ParanoidPerson.class);
 
         // The Framework cannot intercept private method invocation
@@ -237,12 +224,11 @@ public class BeanPathMagicTest {
 
         // Such invocation just fall through to the real method
 
-        assertEquals(paranoidPerson.getSecret(), "The Secrete");
+        assertEquals(paranoidPerson.getSecret(), "The Secret");
     }
 
     @Test(expectedExceptions = BeanPathMagicException.class)
     public void illegal_finalMethod() {
-
         ParanoidPerson paranoidPerson = root(ParanoidPerson.class);
         assertEquals(paranoidPerson.getFinalSecret(), "The Final Secret");
 

@@ -27,10 +27,9 @@ import java.util.Iterator;
 import static org.testng.Assert.*;
 
 public class BeanPathTest {
-
+    @SuppressWarnings("ConstantConditions")
     @Test
     public void basic() {
-
         final BeanPath<DatabaseMetaData> path =
                 BeanPath.root(DataSource.class).append("connection", Connection.class).append("metaData", DatabaseMetaData.class);
 
@@ -42,7 +41,6 @@ public class BeanPathTest {
 
     @Test
     public void pathInvariants() {
-
         final BeanPath<Connection> path = BeanPath.root(DataSource.class).append("connection", Connection.class);
 
         assertEquals(path.hasParent(), path.getParent() != null);
@@ -52,7 +50,6 @@ public class BeanPathTest {
 
     @Test
     public void rootInvariants() {
-
         final BeanPath<DataSource> root = BeanPath.root(DataSource.class);
 
         assertTrue(root.isRoot());
@@ -64,7 +61,6 @@ public class BeanPathTest {
 
     @Test
     public void dotDelimitedStringRepresentation() {
-
         final BeanPath<DatabaseMetaData> path =
                 BeanPath.root(DataSource.class).append("connection", Connection.class).append("metaData", DatabaseMetaData.class);
 
@@ -76,7 +72,6 @@ public class BeanPathTest {
 
     @Test
     public void iterator() {
-
         final BeanPath<DatabaseMetaData> path =
                 BeanPath.root(DataSource.class).append("connection", Connection.class).append("metaData", DatabaseMetaData.class);
 
@@ -92,7 +87,6 @@ public class BeanPathTest {
 
     @Test
     public void equalsAndHashCode() {
-
         final BeanPath<String> somePath = BeanPath.root(Object.class).append("foo", String.class);
         final BeanPath<String> samePath = BeanPath.root(Object.class).append("foo", String.class);
         final BeanPath<String> otherPath = BeanPath.root(Object.class).append("bar", String.class);
@@ -110,7 +104,6 @@ public class BeanPathTest {
 
     @Test
     public void toStringRepresentation() {
-
         final BeanPath<DatabaseMetaData> path =
                 BeanPath.root(DataSource.class).append("connection", Connection.class).append("metaData", DatabaseMetaData.class);
 

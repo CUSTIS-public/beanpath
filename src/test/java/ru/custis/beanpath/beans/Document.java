@@ -17,7 +17,6 @@
 package ru.custis.beanpath.beans;
 
 public class Document {
-
     public String getNumber() { return "123"; }
 
     public String getIssuedBy() { return "Issuer"; }

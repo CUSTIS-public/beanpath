@@ -30,7 +30,6 @@ import java.util.LinkedList;
  */
 @Immutable
 public class BeanPath<T> implements Iterable<BeanPath<?>>, Serializable {
-
     private static final long serialVersionUID = 42L;
 
     private final BeanPath<?> parent;
@@ -38,7 +37,6 @@ public class BeanPath<T> implements Iterable<BeanPath<?>>, Serializable {
     private final Class<T> type;
 
     private BeanPath(BeanPath<?> parent, String name, Class<T> type) {
-
         this.parent = parent;
         this.name = Assert.notNull(name, "name");
         this.type = Assert.notNull(type, "type");
@@ -209,7 +207,7 @@ public class BeanPath<T> implements Iterable<BeanPath<?>>, Serializable {
         return hc;
     }
 
-    // Instances of BeanPath is immutable,
+    // Instances of BeanPath are immutable,
     // thus we can lazy compute and cache derived properties.
     // Furthermore, we do not need synchronization:
     // its ok if two threads compute it twice concurrently.
@@ -233,7 +231,7 @@ public class BeanPath<T> implements Iterable<BeanPath<?>>, Serializable {
         return ts;
     }
 
-    // Instances of BeanPath is immutable,
+    // Instances of BeanPath are immutable,
     // thus we can lazy compute and cache derived properties.
     // Furthermore, we do not need synchronization:
     // its ok if two threads compute it twice concurrently.

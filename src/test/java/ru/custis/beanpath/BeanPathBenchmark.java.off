@@ -33,7 +33,6 @@ import static custis.toolbox.beanpath.BeanPathMagic.root;
 @Measurement(iterations = 10, time = 1000, timeUnit = TimeUnit.MILLISECONDS)
 @Fork(1)
 public class BeanPathBenchmark {
-
     /*
      * This benchmark uses OpenJDK's jmh (http://openjdk.java.net/projects/code-tools/jmh/).
      *

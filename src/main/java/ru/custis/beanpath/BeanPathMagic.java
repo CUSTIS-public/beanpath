@@ -17,12 +17,13 @@
 package ru.custis.beanpath;
 
 import com.google.common.reflect.TypeToken;
-import net.sf.cglib.proxy.InvocationHandler;
+import ru.custis.beanpath.MockMaker.InvocationCallback;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.lang.Character.isUpperCase;
@@ -49,7 +50,7 @@ public class BeanPathMagic {
     public static @Nonnull <T> BeanPath<T> $(T callChain) {
         final BeanPath<?> path = CurrentPath.evict();
         if (path == null) {
-            throw new BeanPathMagicException("No current path. Probably, call your chain consists a final method.");
+            throw new BeanPathMagicException("No current path. Probably your call chain contains a final method.");
         }
         return (BeanPath<T>) path;
     }
@@ -61,8 +62,7 @@ public class BeanPathMagic {
     // --------------------------------------------------------- Implementation
 
     private static class Mocker {
-
-        private static final ConcurrentHashMap<TypeToken, Object> cache = new ConcurrentHashMap<TypeToken, Object>();
+        private static final Map<TypeToken, Object> cache = new ConcurrentHashMap<TypeToken, Object>();
         private static final Object mockCreationGuard = new Object();
 
         @SuppressWarnings("unchecked")
@@ -84,8 +84,7 @@ public class BeanPathMagic {
             return (T) mock;
         }
 
-        private static class MockInvocationHandler implements InvocationHandler {
-
+        private static class MockInvocationHandler implements InvocationCallback {
             // rawMockType can be inferred from mockType,
             // but TypeToken.getRawType() is relatively slow,
             // so avoid it in time critical invoke()
@@ -100,7 +99,6 @@ public class BeanPathMagic {
 
             @Override
             public Object invoke(Object target, Method method, Object[] args) throws Throwable {
-
                 CurrentPath.initIfNotAlready(rawMockType);
 
                 final Type genericReturnType = method.getGenericReturnType();
@@ -137,7 +135,6 @@ public class BeanPathMagic {
     }
 
     private static class CurrentPath {
-
         private static final ThreadLocal<BeanPath<?>> currentPathTL = new ThreadLocal<BeanPath<?>>();
 
         public static void initIfNotAlready(Class<?> clazz) {
@@ -160,11 +157,9 @@ public class BeanPathMagic {
     }
 
     private static class NameUtils {
-
         private static final String IS = "is", GET = "get";
 
         public static String stripGetIsPrefixIfAny(final String name) {
-
             assert (name != null);
 
             if (name.length() > GET.length() && name.startsWith(GET) && isUpperCase(name.charAt(GET.length()))) {
@@ -176,7 +171,6 @@ public class BeanPathMagic {
         }
 
         private static String stripAndDecapitalize(String name, String prefix) {
-
             final int nameLength = name.length();
             final int prefixLength = prefix.length();
             final int i = prefixLength + 1;

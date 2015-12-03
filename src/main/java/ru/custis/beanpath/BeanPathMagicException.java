@@ -19,7 +19,6 @@ package ru.custis.beanpath;
 import java.util.Formatter;
 
 public class BeanPathMagicException extends RuntimeException {
-
     /*package-local*/ BeanPathMagicException(String message) {
         super(message);
     }

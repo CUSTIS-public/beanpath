@@ -17,7 +17,6 @@
 package ru.custis.beanpath.beans;
 
 public class PrimitiveBean {
-
     public boolean getBoolean() { return false; }
 
     public char getChar() { return 0; }

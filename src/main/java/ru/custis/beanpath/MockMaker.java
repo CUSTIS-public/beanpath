@@ -16,122 +16,110 @@
 
 package ru.custis.beanpath;
 
-import net.sf.cglib.core.NamingPolicy;
-import net.sf.cglib.core.Predicate;
-import net.sf.cglib.proxy.*;
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.NamingStrategy;
+import net.bytebuddy.implementation.bind.annotation.AllArguments;
+import net.bytebuddy.implementation.bind.annotation.Argument;
+import net.bytebuddy.implementation.bind.annotation.Origin;
+import net.bytebuddy.implementation.bind.annotation.RuntimeType;
+import net.bytebuddy.implementation.bind.annotation.This;
 
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static net.bytebuddy.dynamic.loading.ClassLoadingStrategy.Default.WRAPPER;
+import static net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy.Default.NO_CONSTRUCTORS;
+import static net.bytebuddy.implementation.MethodDelegation.to;
+import static net.bytebuddy.matcher.ElementMatchers.isBridge;
+import static net.bytebuddy.matcher.ElementMatchers.named;
+import static net.bytebuddy.matcher.ElementMatchers.not;
+import static net.bytebuddy.matcher.ElementMatchers.returns;
+import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 
 /*package-local*/ class MockMaker {
     private MockMaker() {} // static use only
 
-    public static <T> T createMock(Class<T> type, InvocationHandler handler) throws Exception {
+    public interface InvocationCallback {
+        Object invoke(Object proxy, Method method, Object[] args) throws Throwable;
+    }
 
+    public static <T> T createMock(Class<T> type, InvocationCallback handler) throws InstantiationException {
         Assert.notNull(type, "type");
         Assert.notNull(handler, "handler");
 
-        final Class mockClass = generateClass(type);
-        final Object mock = StolenUnsafe.getUnsafe().allocateInstance(mockClass);
-
-        ((Factory) mock).setCallbacks(new Callback[]{defaultObjectMethodsHandler, NoOp.INSTANCE, handler});
+        final Class<? extends T> mockClass = generateClass(type, handler);
+        final Object mock = instantiateClass(mockClass);
 
         return type.cast(mock);
     }
 
-    @SuppressWarnings("unchecked")
-    private static <T> Class<T> generateClass(Class<T> clazzToMock) {
+    private static final ByteBuddy buddy = new ByteBuddy().withNamingStrategy(new MockNamingStrategy());
 
-        final Enhancer enhancer = new Enhancer() {
-            @Override protected void filterConstructors(Class sc, List constructors) {
-                // Don't filter; because default implementation filters out
-                // private constructors, but we are not going to use constructors at all
-            }
-        };
+    private static <T> Class<? extends T> generateClass(Class<T> clazzToMock, InvocationCallback handler) {
+        return
+                buddy
+                        .subclass(clazzToMock, NO_CONSTRUCTORS)
 
-        enhancer.setUseCache(false);
-        enhancer.setUseFactory(true);
+                        .method(not(isBridge()))
+                        .intercept(to(new InvocationCallbackAdapter(handler)))
 
-        enhancer.setNamingPolicy(mockNamingPolicy);
+                        .method(named("equals").and(returns(boolean.class)).and(takesArguments(Object.class)))
+                        .intercept(to(ObjectMethodsHandler.class))
 
-        // try to fix classloader issue
-        enhancer.setClassLoader(MockMaker.class.getClassLoader());
+                        .method(named("hashCode").and(returns(int.class)).and(takesArguments(0)))
+                        .intercept(to(ObjectMethodsHandler.class))
 
-        if (clazzToMock.isInterface()) {
-            enhancer.setSuperclass(Object.class);
-            enhancer.setInterfaces(new Class[]{clazzToMock});
-        } else {
-            enhancer.setSuperclass(clazzToMock);
-        }
+                        .method(named("toString").and(returns(String.class)).and(takesArguments(0)))
+                        .intercept(to(ObjectMethodsHandler.class))
 
-        enhancer.setCallbackFilter(MockCallbackFilter.INSTANCE);
-        enhancer.setCallbackTypes(CALLBACK_TYPES);
-
-        return enhancer.createClass();
+                        .make()
+                        .load(MockMaker.class.getClassLoader(), WRAPPER)
+                        .getLoaded()
+        ;
     }
 
-    private static final AtomicLong counter = new AtomicLong(0);
+    private static <T> Object instantiateClass(Class<T> mockClass) throws InstantiationException {
+        return StolenUnsafe.getUnsafe().allocateInstance(mockClass);
+    }
 
-    private static final NamingPolicy mockNamingPolicy = new NamingPolicy() {
+    private static class MockNamingStrategy implements NamingStrategy {
+        private final AtomicLong counter = new AtomicLong(0);
+
         @Override
-        public String getClassName(String prefix, String source, Object key, Predicate names) {
+        public String name(UnnamedType unnamedType) {
+            String prefix = unnamedType.getSuperClass().getTypeName();
             return getClass().getPackage().getName() + ".BeanPathMagicMock_of_" + prefix + "_$" + counter.getAndIncrement();
         }
-    };
+    }
 
-    private static final Class[] CALLBACK_TYPES = new Class[]{InvocationHandler.class, NoOp.class, InvocationHandler.class};
+    @SuppressWarnings("unused")
+    public static class InvocationCallbackAdapter {
+        private final InvocationCallback callback;
 
-    private static class MockCallbackFilter implements CallbackFilter {
+        public InvocationCallbackAdapter(InvocationCallback callback) {
+            this.callback = callback;
+        }
 
-        public static final MockCallbackFilter INSTANCE = new MockCallbackFilter();
-
-        @Override
-        public int accept(Method method) {
-            if (MethodsGuru.isEqualsHashCodeOrToStringMethod(method)) {
-                return 0; // -> ObjectMethodsHandler.INSTANCE
-            } else if (method.isBridge()) {
-                return 1; // -> NoOp.INSTANCE
-            } else {
-                return 2; // -> InvocationHandler
-            }
+        @RuntimeType
+        public Object defaultHandler(@This Object proxy, @Origin Method method, @AllArguments Object[] args) throws Throwable {
+            return callback.invoke(proxy, method, args);
         }
     }
 
-    private static InvocationHandler defaultObjectMethodsHandler = new InvocationHandler() {
-        @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            if (MethodsGuru.isEqualsMethod(method)) {
-                return (proxy == args[0]);
-            } else if (MethodsGuru.isHashCodeMethod(method)) {
-                return System.identityHashCode(proxy);
-            } else if (MethodsGuru.isToStringMethod(method)) {
-                return proxy.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(proxy));
-            }
-            throw new RuntimeException("Impossible occurred: Not a java.lang.Object method: " + method);
-        }
-    };
+    @SuppressWarnings("unused")
+    public static class ObjectMethodsHandler {
+        private ObjectMethodsHandler() {}
 
-    private static abstract class MethodsGuru {
-
-        public static boolean isEqualsHashCodeOrToStringMethod(Method method) {
-            return isEqualsMethod(method) || isHashCodeMethod(method) || isToStringMethod(method);
+        public static boolean equalsHandler(@This Object thiz, @Argument(0) Object that) {
+            return thiz == that;
         }
 
-        public static boolean isEqualsMethod(Method method) {
-            return method.getParameterTypes().length == 1
-                   && method.getName().equals("equals")
-                   && method.getParameterTypes()[0] == Object.class;
+        public static int hashCodeHandler(@This Object proxy) {
+            return System.identityHashCode(proxy);
         }
 
-        public static boolean isHashCodeMethod(Method method) {
-            return method.getParameterTypes().length == 0
-                   && method.getName().equals("hashCode");
-        }
-
-        public static boolean isToStringMethod(Method method) {
-            return method.getParameterTypes().length == 0
-                   && method.getName().equals("toString");
+        public static String toStringHandler(@This Object proxy) {
+            return proxy.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(proxy));
         }
     }
 }
