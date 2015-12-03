@@ -4,7 +4,7 @@
 
     <groupId>ru.custis.beanpath</groupId>
     <artifactId>beanpath</artifactId>
-    <version>1.1-lean</version>
+    <version>1.1.1</version>
     <packaging>jar</packaging>
 
     <name>CUSTIS beanpath</name>
@@ -91,7 +91,7 @@
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
-            <version>0.7-rc6</version>
+            <version>0.7.4</version>
         </dependency>
 
         <!-- Syntactic sugar -->
