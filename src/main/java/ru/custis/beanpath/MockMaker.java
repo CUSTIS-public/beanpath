@@ -27,6 +27,7 @@ import net.bytebuddy.implementation.bind.annotation.This;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static net.bytebuddy.dynamic.loading.ClassLoadingStrategy.Default.WRAPPER;
 import static net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy.Default.NO_CONSTRUCTORS;
 import static net.bytebuddy.implementation.MethodDelegation.to;
@@ -36,16 +37,16 @@ import static net.bytebuddy.matcher.ElementMatchers.not;
 import static net.bytebuddy.matcher.ElementMatchers.returns;
 import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 
-/*package-local*/ class MockMaker {
-    private MockMaker() {} // static use only
+final class MockMaker {
+    private MockMaker() {}
 
     public interface InvocationCallback {
         Object invoke(Object proxy, Method method, Object[] args) throws Throwable;
     }
 
     public static <T> T createMock(Class<T> type, InvocationCallback handler) throws InstantiationException {
-        Assert.notNull(type, "type");
-        Assert.notNull(handler, "handler");
+        checkNotNull(type, "Argument 'type' must not be null");
+        checkNotNull(handler, "Argument 'handler' must not be null");
 
         final Class<? extends T> mockClass = generateClass(type, handler);
         final Object mock = instantiateClass(mockClass);
@@ -107,7 +108,7 @@ import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
     }
 
     @SuppressWarnings("unused")
-    public static class ObjectMethodsHandler {
+    public static final class ObjectMethodsHandler {
         private ObjectMethodsHandler() {}
 
         public static boolean equalsHandler(@This Object thiz, @Argument(0) Object that) {

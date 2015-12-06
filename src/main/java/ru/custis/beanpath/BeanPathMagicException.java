@@ -19,11 +19,11 @@ package ru.custis.beanpath;
 import java.util.Formatter;
 
 public class BeanPathMagicException extends RuntimeException {
-    /*package-local*/ BeanPathMagicException(String message) {
+    BeanPathMagicException(String message) {
         super(message);
     }
 
-    /*package-local*/ BeanPathMagicException(String message, Object... args) {
+    BeanPathMagicException(String message, Object... args) {
         super(format(message, args), extractIfAny(args, Throwable.class));
     }
 

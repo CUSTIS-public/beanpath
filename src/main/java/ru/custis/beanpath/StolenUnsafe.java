@@ -21,8 +21,8 @@ import sun.misc.Unsafe;
 import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
 
-/*package-local*/ class StolenUnsafe {
-    private StolenUnsafe() {} // static use only
+final class StolenUnsafe {
+    private StolenUnsafe() {}
 
     /*
      * sun.misc.Unsafe.getUnsafe() has runtime check to be accessed

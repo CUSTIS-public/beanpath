@@ -25,6 +25,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Models chain of bean properties in object oriented manner
  */
@@ -38,15 +40,15 @@ public class BeanPath<T> implements Iterable<BeanPath<?>>, Serializable {
 
     private BeanPath(BeanPath<?> parent, String name, Class<T> type) {
         this.parent = parent;
-        this.name = Assert.notNull(name, "name");
-        this.type = Assert.notNull(type, "type");
+        this.name = checkNotNull(name, "Argument 'name' must not be null");
+        this.type = checkNotNull(type, "Argument 'type' must not be null");
     }
 
     /**
      * Creates root path of given {@code type}, with pseudo name {@code <root>} and no parent
      */
     public static @Nonnull <T> BeanPath<T> root(@Nonnull Class<T> type) {
-        Assert.notNull(type, "type");
+        checkNotNull(type, "Argument 'type' must not be null");
         return new BeanPath<T>(null, "<root>", type);
     }
 
@@ -55,8 +57,8 @@ public class BeanPath<T> implements Iterable<BeanPath<?>>, Serializable {
      * Creates new instance, leaves {@code this} intact.
      */
     public @Nonnull <T1> BeanPath<T1> append(@Nonnull String name, @Nonnull Class<T1> type) {
-        Assert.notNull(name, "name");
-        Assert.notNull(type, "type");
+        checkNotNull(name, "Argument 'name' must not be null");
+        checkNotNull(type, "Argument 'type' must not be null");
         return new BeanPath<T1>(this, name, type);
     }
 
@@ -239,8 +241,7 @@ public class BeanPath<T> implements Iterable<BeanPath<?>>, Serializable {
 
     private StringBuilder toString(StringBuilder sb) {
         if (hasParent()) {
-            parent.toString(sb);
-            sb.append("/");
+            parent.toString(sb).append("/");
         }
         sb.append(name).append(':').append(type.getSimpleName());
         return sb;

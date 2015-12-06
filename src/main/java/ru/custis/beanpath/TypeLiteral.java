@@ -53,7 +53,7 @@ public abstract class TypeLiteral<T> {
     }
 
     @SuppressWarnings("unchecked")
-    /*package-local*/ TypeToken<T> toTypeToken() {
+    TypeToken<T> toTypeToken() {
         return (TypeToken<T>) TypeToken.of(capturedType);
     }
 }
