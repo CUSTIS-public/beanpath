@@ -18,6 +18,7 @@ package ru.custis.beanpath;
 
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.NamingStrategy;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Argument;
 import net.bytebuddy.implementation.bind.annotation.Origin;
@@ -54,7 +55,7 @@ final class MockMaker {
         return type.cast(mock);
     }
 
-    private static final ByteBuddy buddy = new ByteBuddy().withNamingStrategy(new MockNamingStrategy());
+    private static final ByteBuddy buddy = new ByteBuddy().with(new MockNamingStrategy());
 
     private static <T> Class<? extends T> generateClass(Class<T> clazzToMock, InvocationCallback handler) {
         return
@@ -76,19 +77,19 @@ final class MockMaker {
                         .make()
                         .load(MockMaker.class.getClassLoader(), WRAPPER)
                         .getLoaded()
-        ;
+                ;
     }
 
     private static <T> Object instantiateClass(Class<T> mockClass) throws InstantiationException {
         return StolenUnsafe.getUnsafe().allocateInstance(mockClass);
     }
 
-    private static class MockNamingStrategy implements NamingStrategy {
+    private static class MockNamingStrategy extends NamingStrategy.AbstractBase {
         private final AtomicLong counter = new AtomicLong(0);
 
         @Override
-        public String name(UnnamedType unnamedType) {
-            String prefix = unnamedType.getSuperClass().getTypeName();
+        public String name(TypeDescription superClass) {
+            String prefix = superClass.getTypeName();
             return getClass().getPackage().getName() + ".BeanPathMagicMock_of_" + prefix + "_$" + counter.getAndIncrement();
         }
     }
